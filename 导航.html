@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一只牛马的网址导航</title>
+    <style>
+        /* 全局样式重置 - 匹配目标网站极简风格 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        /* 顶部导航栏 - 匹配目标网站样式 */
+        .top-nav {
+            background-color: #fff;
+            height: 60px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .top-nav .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d8cf0;
+            letter-spacing: 1px;
+        }
+
+        /* 主容器 - 匹配目标网站布局 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px 40px;
+        }
+
+        /* 搜索区域 - 核心复刻目标网站 */
+        .search-wrap {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .search-title {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #search-input {
+            width: 100%;
+            height: 50px;
+            padding: 0 60px 0 20px;
+            border: 1px solid #e5e5e5;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        #search-input:focus {
+            border-color: #2d8cf0;
+            box-shadow: 0 0 0 3px rgba(45, 140, 240, 0.1);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #2d8cf0;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background-color: #2b85e4;
+        }
+
+        /* 导航分类区域 - 纵向排列，每个分类横向展开 */
+        .nav-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ========== 核心修改：所有分类块统一立体样式 ========== */
+        .category-card {
+            /* 基础样式 */
+            background-color: #fff;
+            border-radius: 6px;
+            padding: 15px 20px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            /* 立体核心样式 */
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.08),
+                0 1px 3px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+            background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+            border: 1px solid #e8f4f8;
+            transform: perspective(1000px) translateY(-1px);
+            transition: all 0.2s ease;
+        }
+
+        /* 每个分类块顶部不同颜色的装饰线条（区分不同分类） */
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* 开始牛马 - 蓝绿色渐变 */
+        .category-card.niuma-card::before {
+            background: linear-gradient(90deg, #2d8cf0, #42b983);
+        }
+
+        /* AI助手 - 紫蓝色渐变 */
+        .category-card.ai-card::before {
+            background: linear-gradient(90deg, #9f7aea, #38b2ac);
+        }
+
+        /* 其他链接一 - 橙黄色渐变 */
+        .category-card.other-card::before {
+            background: linear-gradient(90deg, #ed8936, #ecc94b);
+        }
+
+        /* 工具应用 - 青蓝色渐变 */
+        .category-card.tool-card::before {
+            background: linear-gradient(90deg, #4299e1, #38b2ac);
+        }
+
+        /* 悬浮时更强的立体效果 */
+        .category-card:hover {
+            box-shadow: 
+                0 8px 15px rgba(0, 0, 0, 0.12),
+                0 3px 6px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+            transform: perspective(1000px) translateY(-4px);
+        }
+
+        /* 所有分类标题强化样式 */
+        .category-card .category-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f5f5f5;
+            display: inline-block;
+            position: relative;
+            padding-left: 8px;
+        }
+
+        /* 标题左侧指示线（颜色和顶部线条匹配） */
+        .niuma-card .category-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background-color: #2d8cf0;
+            border-radius: 3px;
+        }
+
+        .ai-card .category-title::before {
+            background-color: #9f7aea;
+        }
+
+        .other-card .category-title::before {
+            background-color: #ed8936;
+        }
+
+        .tool-card .category-title::before {
+            background-color: #4299e1;
+        }
+
+        /* 所有分类标题文字颜色 */
+        .niuma-card .category-title { color: #2d8cf0; }
+        .ai-card .category-title { color: #9f7aea; }
+        .other-card .category-title { color: #ed8936; }
+        .tool-card .category-title { color: #4299e1; }
+
+        /* 所有分类链接项强化 */
+        .category-card .link-item {
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .category-card .link-item:hover {
+            background-color: #e8f4f8;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+        /* ========== 立体样式结束 ========== */
+
+        /* 链接列表 - 横向排列，自动换行 */
+        .link-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .link-item:hover {
+            color: inherit; /* 取消原有文字变色，保持统一 */
+        }
+
+        /* 图标样式 */
+        .link-favicon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            object-fit: contain;
+            background-color: #f5f5f5;
+        }
+
+        .link-name {
+            font-size: 0.9rem;
+            flex: none;
+        }
+
+        /* 底部信息 */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #999;
+            font-size: 0.8rem;
+            padding: 20px 0;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 70px 15px 30px;
+            }
+            
+            .link-item {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+            
+            .link-favicon {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #search-input {
+                height: 45px;
+            }
+            
+            .category-card {
+                padding: 12px 15px;
+            }
+            
+            .link-list {
+                gap: 8px;
+            }
+        }
+
+        /* 加载失败的默认图标 */
+        .default-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 0.8rem;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <div class="logo">牛马导航</div>
+    </div>
+
+    <div class="container">
+        <!-- 搜索区域 -->
+        <div class="search-wrap">
+            <div class="search-title">高效工作，从这里开始</div>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="搜索网站、内容...">
+                <button class="search-btn" id="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 导航分类区域 -->
+        <div class="nav-categories">
+            <!-- 开始牛马 - 立体样式 + 专属配色 -->
+            <div class="category-card niuma-card">
+                <div class="category-title">开始牛马</div>
+                <div class="link-list">
+                    <a href="https://gd.gzwjrz.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://kefu.gzwjrz.com/favicon.ico" alt="安士维工单系统图标" loading="lazy">
+                        <span class="link-name">安士维工单系统</span>
+                    </a>
+                    <a href="https://kefu.gzwjrz.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://kefu.gzwjrz.com/favicon.ico" alt="安士维客服系统图标" loading="lazy">
+                        <span class="link-name">安士维客服系统</span>
+                    </a>
+                    <a href="https://icafe.icloud.cn/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://icafe.icloud.cn/favicon.ico" alt="顺网云平台图标" loading="lazy">
+                        <span class="link-name">顺网云平台</span>
+                    </a>
+                    <a href="https://docs.qq.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://dynamic-image.mydown.com/160x160/uploadImages/2025/331/00/609E7R0BFASA.jpg" alt="腾讯文档图标" loading="lazy">
+                        <span class="link-name">值班知识库</span>
+                    </a>
+                    <a href="http://admin.haoyisoft.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="http://admin.haoyisoft.com/favicon.ico" alt="pubwin计费解绑图标" loading="lazy">
+                        <span class="link-name">pubwin计费解绑</span>
+                    </a>
+                    <a href="https://lwy.yungengxin.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://lwy.yungengxin.com/favicon.ico" alt="云更新云平台图标" loading="lazy">
+                        <span class="link-name">云更新云平台</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- AI助手 - 立体样式 + 专属配色 -->
+            <div class="category-card ai-card">
+                <div class="category-title">AI助手</div>
+                <div class="link-list">
+                    <a href="https://www.doubao.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/samantha/logo-icon-white-bg.png" alt="抖音豆包图标" loading="lazy">
+                        <span class="link-name">抖音豆包</span>
+                    </a>
+                    <a href="https://www.qianwen.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://img.alicdn.com/imgextra/i4/O1CN01P8z9P91OBXM3D0VOt_!!6000000001667-2-tps-174-60.png" alt="阿里千问图标" loading="lazy">
+                        <span class="link-name">阿里千问</span>
+                    </a>
+                    <a href="https://yuanbao.tencent.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://yuanbao.tencent.com/favicon.ico" alt="腾讯元宝图标" loading="lazy">
+                        <span class="link-name">腾讯元宝</span>
+                    </a>
+                    <a href="https://www.deepseek.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://www.deepseek.com/favicon.ico" alt="DeepSeek图标" loading="lazy">
+                        <span class="link-name">DeepSeek</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 其他链接一 - 立体样式 + 专属配色 -->
+            <div class="category-card other-card">
+                <div class="category-title">文档/网盘</div>
+                <div class="link-list">
+                    <a href="https://help.sicent.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://help.sicent.com/favicon.ico" alt="顺网产品帮助中心图标" loading="lazy">
+                        <span class="link-name">顺网产品帮助中心</span>
+                    </a>
+                    <a href="https://www.yuque.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://www.wywk.cn/_next/static/images/logo-28245195fa52148d026ae5d6d1ec7ce4.svg" alt="语雀图标" loading="lazy">
+                        <span class="link-name">网鱼帮助文档</span>
+                    </a>
+                    <a href="https://www.yuque.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://www.yuque.com/favicon.ico" alt="语雀图标" loading="lazy">
+                        <span class="link-name">AI精灵帮助文档</span>
+                    </a>
+                                        <a href="https://wypan.wywk.cn/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://www.wywk.cn/_next/static/images/logo-28245195fa52148d026ae5d6d1ec7ce4.svg" alt="网鱼网盘图标" loading="lazy">
+                        <span class="link-name">网鱼网盘</span>
+                    </a>
+                    <a href="http://shiliu.ysepan.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="http://www.ys168.com/zy/img/ys168.png" alt="十六的网盘" loading="lazy">
+                        <span class="link-name">十六的网盘</span>
+                    </a>
+
+
+                </div>
+            </div>
+
+            <!-- 工具应用 - 立体样式 + 专属配色 -->
+            <div class="category-card tool-card">
+                <div class="category-title">其他链接</div>
+                <div class="link-list">
+                    <a href="https://netbar.qq.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://netbar.qq.com/favicon.ico" alt="qq网关" loading="lazy">
+                        <span class="link-name">QQ网关</span>
+                    </a>
+                    <a href="https://www.pubwinol.com/index" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://www.pubwinol.com/favicon.ico" alt="pubwinol" loading="lazy">
+                        <span class="link-name">pubwinol</span>
+                    </a>
+                    <a href="https://www.54laoban.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://help.sicent.com/images/X%E7%AE%A1%E5%AE%B6.png" alt="x管家" loading="lazy">
+                        <span class="link-name">顺网X管家</span>
+                    </a>
+                    <a href="https://www.weihudashi.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://www.weihudashi.com/favicon.ico" alt="维护大师" loading="lazy">
+                        <span class="link-name">维护大师</span>
+                    </a>
+                    <a href="https://zhiweicloud.com/" target="_blank" class="link-item">
+                        <img class="link-favicon" src="https://www.weihudashi.com/favicon.ico" alt="维护大师" loading="lazy">
+                        <span class="link-name">维护大师V3</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部信息 -->
+        <div class="footer">
+            <p>© 2025 牛马导航 - 爱做牛马的网址导航</p>
+        </div>
+    </div>
+
+    <script>
+        // 搜索功能
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        searchBtn.addEventListener('click', performSearch);
+
+        function performSearch() {
+            const keyword = searchInput.value.trim();
+            if (keyword) {
+                window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(keyword)}`, '_blank');
+                searchInput.value = '';
+            } else {
+                searchInput.focus();
+            }
+        }
+
+        // 图标加载失败处理
+        document.querySelectorAll('.link-favicon').forEach(img => {
+            img.onerror = function() {
+                this.remove();
+                const defaultIcon = document.createElement('div');
+                defaultIcon.className = 'default-icon';
+                
+                const linkName = this.parentElement.querySelector('.link-name').textContent;
+                let iconClass = 'fa-globe';
+                if (linkName.includes('工单') || linkName.includes('客服')) iconClass = 'fa-headset';
+                else if (linkName.includes('AI') || linkName.includes('助手')) iconClass = 'fa-robot';
+                else if (linkName.includes('文档') || linkName.includes('知识库')) iconClass = 'fa-file-alt';
+                else if (linkName.includes('工具') || linkName.includes('转换')) iconClass = 'fa-tools';
+                else if (linkName.includes('PS') || linkName.includes('设计')) iconClass = 'fa-paint-brush';
+                else if (linkName.includes('网盘')) iconClass = 'fa-cloud';
+                else if (linkName.includes('计费')) iconClass = 'fa-calculator';
+
+                defaultIcon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+                this.parentElement.insertBefore(defaultIcon, this.parentElement.firstChild);
+            };
+        });
+    </script>
+</body>
+</html>
